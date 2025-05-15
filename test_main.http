@@ -1,0 +1,13 @@
+### Test root
+GET http://127.0.0.1:8000/
+Accept: application/json
+
+###
+
+### Test dự đoán với triệu chứng
+POST http://127.0.0.1:8000/predict_disease/
+Content-Type: application/json
+
+{
+  "symptoms": ["fever", "fatigue"]
+}
