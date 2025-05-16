@@ -1,17 +1,24 @@
 # FastAPI Server với Docker
 
-## Build Docker Image
+## Hướng dẫn build và chạy Docker container
 
-Chạy lệnh sau trong thư mục chứa `Dockerfile` để build image:
+### 1. Build Docker Image
+
+Chạy lệnh sau trong thư mục chứa `Dockerfile` để tạo image với tên `fastapi-server`:
 
 ```bash
 docker build -t fastapi-server .
 
+```
 
-Chạy container với tên fastapi, map cổng 8000 để truy cập API:
+### 2. Run Docker Container
+
+Mở CMD và chạy lệnh sau để khởi động server:
 
 ```bash
 docker run -d -p 8000:8000 --name fastapi fastapi-server
 
+```
 
-Trên máy chạy Docker: http://localhost:8000
+### 3. Lưu ý
+Phải mở docker desktop rồi mới run server

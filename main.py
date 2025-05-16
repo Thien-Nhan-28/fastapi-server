@@ -26,6 +26,12 @@ def root():
 @app.get("/symptoms")
 def get_symptoms():
     return {"symptoms": symptom_columns}
+
+@app.get("/disease_labels")
+def get_disease_labels():
+    labels = disease_encoder.classes_.tolist()
+    return {"disease_labels": labels}
+
 @app.get("/couple")
 def get_couple():
     data = df_disease_specialty.to_dict(orient='records')
