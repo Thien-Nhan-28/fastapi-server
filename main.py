@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware  # 💡 Thêm dòng này
 from pydantic import BaseModel
 from typing import List
 import tensorflow as tf
@@ -7,6 +8,15 @@ import numpy as np
 import pandas as pd
 
 app = FastAPI()
+
+# Cho phép truy cập từ frontend (localhost:3000)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # 🎯 Thêm origin React của bạn ở đây
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load model MLP
 mlp_model = tf.keras.models.load_model("model/mlp_model.keras")
@@ -55,12 +65,10 @@ def predict_disease(request: SymptomsRequest):
     # Lấy chuyên khoa tương ứng
     specialty = df_disease_specialty[df_disease_specialty['diseases'] == pred_disease]['specialty'].values
     specialty_name = specialty[0] if len(specialty) > 0 else "Unknown"
-    print("Specialty found:", specialty_name)
+
     print("Disease predicted:", pred_disease)
     print("Specialty found:", specialty_name)
-    print("Specialty array:", specialty)
 
-    # Trả về cả bệnh và chuyên khoa
     return {
         "predicted_disease": pred_disease,
         "predicted_specialty": specialty_name
