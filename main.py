@@ -12,7 +12,7 @@ app = FastAPI()
 # Cho phép truy cập từ frontend (localhost:3000)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # 🎯 Thêm origin React của bạn ở đây
+    allow_origins=["*"],  # 🎯 Thêm origin React của bạn ở đây
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,21 +55,29 @@ def predict_disease(request: SymptomsRequest):
     input_vector = [1 if symptom in input_symptoms else 0 for symptom in symptom_columns]
     input_df = pd.DataFrame([input_vector], columns=symptom_columns)
 
-    # Dự đoán bệnh
-    preds = mlp_model.predict(input_df)
-    pred_class = np.argmax(preds, axis=1)
+    # Dự đoán xác suất các bệnh
+    preds = mlp_model.predict(input_df)  # preds là mảng xác suất shape (1, num_classes)
 
-    # Giải mã tên bệnh
-    pred_disease = disease_encoder.inverse_transform(pred_class)[0]
+    # Lấy 2 chỉ số có xác suất cao nhất
+    top_indices = preds[0].argsort()[-3:][::-1]
 
-    # Lấy chuyên khoa tương ứng
-    specialty = df_disease_specialty[df_disease_specialty['diseases'] == pred_disease]['specialty'].values
-    specialty_name = specialty[0] if len(specialty) > 0 else "Unknown"
+    # Tạo list chứa tên bệnh và chuyên khoa tương ứng
+    predicted_diseases = []
+    predicted_specialties = []
 
-    print("Disease predicted:", pred_disease)
-    print("Specialty found:", specialty_name)
+    for idx in top_indices:
+        disease_name = disease_encoder.inverse_transform([idx])[0]
+        specialty = df_disease_specialty[df_disease_specialty['diseases'] == disease_name]['specialty'].values
+        specialty_name = specialty[0] if len(specialty) > 0 else "Unknown"
+
+        predicted_diseases.append(disease_name)
+        predicted_specialties.append(specialty_name)
+
+    # Debug log
+    print("Predicted diseases:", predicted_diseases)
+    print("Predicted specialties:", predicted_specialties)
 
     return {
-        "predicted_disease": pred_disease,
-        "predicted_specialty": specialty_name
+        "predicted_disease": predicted_diseases,
+        "predicted_specialty": predicted_specialties
     }
