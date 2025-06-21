@@ -22,3 +22,10 @@ docker run -d -p 8000:8000 --name fastapi fastapi-server
 
 ### 3. Lưu ý
 Phải mở docker desktop rồi mới run server
+
+
+### 4. Cách chạy trên terminal
+
+```
+uvicorn main:app --reload
+```
